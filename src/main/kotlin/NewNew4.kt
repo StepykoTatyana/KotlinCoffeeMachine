@@ -1,55 +1,79 @@
+import java.lang.Exception
+
 var water = 400
 var milk = 540
 var coffee_beans = 120
 var cups = 9
 var money = 550
+var lack = ""
 
 fun main() {
-    take()
-    println("\nWrite action (buy, fill, take):")
-    when (readln()) {
-        "buy" -> {
-            println("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:")
-            when (readln().toInt()) {
-                1 -> {
-                    buy(250, 0, 16, 4)
-                }
+    //take()
+    while (true) {
 
-                2 -> {
-                    buy(350, 75, 20, 7)
-                }
+        println("Write action (buy, fill, take, remaining, exit):")
+        when (readln()) {
+            "buy" -> {
+                println("\nWhat do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:")
+                when (readln().toIntOrNull()) {
+                    1 -> {
+                        buy(250, 0, 16, 4)
+                    }
 
-                3 -> {
-                    buy(200, 100, 12, 6)
-                }
+                    2 -> {
+                        buy(350, 75, 20, 7)
+                    }
 
+                    3 -> {
+                        buy(200, 100, 12, 6)
+                    }
+
+                    null -> {
+                        println()
+                        continue
+                    }
+
+
+                }
+            }
+
+            "fill" -> feel()
+            "take" -> {
+                println("I gave you $$money")
+                money = 0
+                println()
+//                take()
+            }
+
+            "remaining" -> {
+                println()
+                take()
+                println()
+            }
+
+            "exit" -> {
+                break
             }
         }
-
-        "fill" -> feel()
-        "take" -> {
-            println("I gave you $$money")
-            money = 0
-            println()
-            take()
-        }
     }
+
 }
 
 fun feel() {
+    println()
     println("Write how many ml of water do you want to add:")
-    water = 400 + readln().toInt()
+    water += readln().toInt()
     println("Write how many ml of milk do you want to add:")
-    milk = 540 + readln().toInt()
+    milk += readln().toInt()
 
 
     println("Write how many grams of coffee beans do you want to add:")
-    coffee_beans = 120 + readln().toInt()
+    coffee_beans += readln().toInt()
 
     println("Write how many disposable cups of coffee do you want to add:")
-    cups = 9 + readln().toInt()
+    cups += readln().toInt()
     println()
-    take()
+//    take()
 }
 
 
@@ -71,11 +95,34 @@ fun buy(
     coffeeBeansForCoffee: Int,
     moneyForCoffee: Int
 ) {
-    water -= waterForCoffee
-    milk -= milkForCoffee
-    coffee_beans -= coffeeBeansForCoffee
-    cups -= 1
-    money += moneyForCoffee
-    println()
-    take()
+
+
+    if (water >= waterForCoffee && coffee_beans >= coffeeBeansForCoffee &&
+        milk >= milkForCoffee
+    ) {
+        print("I have enough resources, making you a coffee!")
+        println()
+        water -= waterForCoffee
+        milk -= milkForCoffee
+        coffee_beans -= coffeeBeansForCoffee
+        cups -= 1
+        money += moneyForCoffee
+        println()
+        //take()
+    } else {
+        if (water < waterForCoffee) {
+            lack = "water"
+        }
+
+        if (milk < milkForCoffee) {
+            lack = "milk"
+        }
+        if (coffee_beans < coffeeBeansForCoffee) {
+            lack = "coffee beans"
+        }
+        println("Sorry, not enough $lack!")
+        println()
+    }
+
+
 }
