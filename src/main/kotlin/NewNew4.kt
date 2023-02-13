@@ -1,128 +1,96 @@
-import java.lang.Exception
+import kotlin.math.pow
 
-var water = 400
-var milk = 540
-var coffee_beans = 120
-var cups = 9
-var money = 550
-var lack = ""
+
+
+class VinylStore(private val vinyl: String) {
+    fun printVinyl() {
+        println(this.vinyl)
+    }
+}
+
+enum class Currency(var code: String) {
+    USD("United States dollar"),
+    EUR("Euro"),
+    GBP("Pound sterling"),
+    RUB("Russian ruble"),
+    UAH("Ukrainian hryvnia"),
+    KZT("Kazakhstani tenge"),
+    CAD("Canadian dollar"),
+    JPY("Japanese yen"),
+    CNY("Chinese yuan");
+
+    fun new() {
+
+    }
+}
+
+enum class DaysOfTheWeek {
+    SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY
+}
+
+
+enum class Rainbow(val colorName: String) {
+    RED("Red"),
+    ORANGE("Orange"),
+    YELLOW("Yellow"),
+    GREEN("Green"),
+    BLUE("Blue"),
+    INDIGO("Indigo"),
+    VIOLET("Violet"),
+    NULL("")
+}
+
+fun findByName(name: String): Rainbow {
+    for (color in Rainbow.values()) {
+        if (name == color.colorName) return color
+    }
+    return Rainbow.NULL
+}
+
+enum class DangerLevel(private val dangerLevel: Int) {
+    HIGH(3),
+    MEDIUM(2),
+    LOW(1);
+
+    fun getLevel(): Int {
+        return dangerLevel;
+    }
+}
+
 
 fun main() {
-    //take()
+    val high = DangerLevel.HIGH
+    val medium = DangerLevel.MEDIUM
+
+    println(high.getLevel() > medium.getLevel())
+    val color = findByName("Black")
+    println(color.ordinal)
+    for (enum in DaysOfTheWeek.values()) {
+        println(enum.name)
+    }
+    val parameter1 = readln()
+    val parameter2 = readln().toInt()
+    when (parameter1) {
+        "amount" -> amount(amount = parameter2)
+        "percent" -> amount(percent = parameter2)
+        "years" -> amount(years = parameter2)
+    }
+
+    val coffeeMachine = CoffeeMachine()
     while (true) {
-
         println("Write action (buy, fill, take, remaining, exit):")
-        when (readln()) {
-            "buy" -> {
-                println("\nWhat do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino:")
-                when (readln().toIntOrNull()) {
-                    1 -> {
-                        buy(250, 0, 16, 4)
-                    }
-
-                    2 -> {
-                        buy(350, 75, 20, 7)
-                    }
-
-                    3 -> {
-                        buy(200, 100, 12, 6)
-                    }
-
-                    null -> {
-                        println()
-                        continue
-                    }
-
-
-                }
-            }
-
-            "fill" -> feel()
-            "take" -> {
-                println("I gave you $$money")
-                money = 0
-                println()
-//                take()
-            }
-
-            "remaining" -> {
-                println()
-                take()
-                println()
-            }
-
-            "exit" -> {
-                break
-            }
+        val action = readln()
+        if (action == "exit") {
+            break
+        } else {
+            coffeeMachine.setAction(action)
         }
     }
 
-}
 
-fun feel() {
-    println()
-    println("Write how many ml of water do you want to add:")
-    water += readln().toInt()
-    println("Write how many ml of milk do you want to add:")
-    milk += readln().toInt()
-
-
-    println("Write how many grams of coffee beans do you want to add:")
-    coffee_beans += readln().toInt()
-
-    println("Write how many disposable cups of coffee do you want to add:")
-    cups += readln().toInt()
-    println()
-//    take()
 }
 
 
-fun take() {
-    println(
-        """The coffee machine has: 
-$water of water
-$milk of milk
-$coffee_beans of coffee beans
-$cups of disposable cups 
-$$money of money"""
-    )
-}
-
-
-fun buy(
-    waterForCoffee: Int,
-    milkForCoffee: Int,
-    coffeeBeansForCoffee: Int,
-    moneyForCoffee: Int
-) {
-
-
-    if (water >= waterForCoffee && coffee_beans >= coffeeBeansForCoffee &&
-        milk >= milkForCoffee
-    ) {
-        print("I have enough resources, making you a coffee!")
-        println()
-        water -= waterForCoffee
-        milk -= milkForCoffee
-        coffee_beans -= coffeeBeansForCoffee
-        cups -= 1
-        money += moneyForCoffee
-        println()
-        //take()
-    } else {
-        if (water < waterForCoffee) {
-            lack = "water"
-        }
-
-        if (milk < milkForCoffee) {
-            lack = "milk"
-        }
-        if (coffee_beans < coffeeBeansForCoffee) {
-            lack = "coffee beans"
-        }
-        println("Sorry, not enough $lack!")
-        println()
-    }
-
-
+fun amount(amount: Int = 1000, percent: Int = 5, years: Int = 10) {
+    println((amount * ((1 + percent.toDouble() / 100).pow(years))).toInt())
 }
