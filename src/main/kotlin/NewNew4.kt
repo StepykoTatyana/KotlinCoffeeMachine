@@ -1,7 +1,6 @@
 import kotlin.math.pow
 
 
-
 class VinylStore(private val vinyl: String) {
     fun printVinyl() {
         println(this.vinyl)
@@ -59,6 +58,10 @@ enum class DangerLevel(private val dangerLevel: Int) {
 
 
 fun main() {
+
+
+
+
     val high = DangerLevel.HIGH
     val medium = DangerLevel.MEDIUM
 
