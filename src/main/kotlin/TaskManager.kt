@@ -1,50 +1,36 @@
-import java.lang.Exception
-import kotlin.math.max
+import kotlinx.datetime.*
+
+var mapWithInputTask = mutableMapOf<Int, Task>()
+var priorityTask: String = ""
+var dateTask: String = ""
+var timeTask: String = ""
+var dateTimeArray: List<String> = arrayListOf()
+var taskValue: String = ""
+var numTask: Int = 1
 
 fun main() {
-    val mapWithInput = mutableMapOf<Int, String>()
-    var i = 1
     while (true) {
-        println("Input an action (add, print, end):")
+        println("Input an action (add, print, edit, delete, end):")
         when (readln()) {
+
             "add" -> {
-                println("Input a new task (enter a blank line to end):")
-                var taskList = ""
-                var j = 1
-                while (true) {
-                    val input = readln().trim()
-                    if (input == "") {
-                        break
-                    } else {
-                        if (j == 1) {
-                            taskList += "$i\t" + input + "\n"
-                            j++
-                        } else {
-                            taskList += "\t" + input + "\n"
-                        }
 
-
-                    }
-                }
-                if (taskList != "") {
-                    mapWithInput[i] = taskList
-                    i++
-                } else {
-                    println("The task is blank")
-                }
-
+                priority()
+                dateTask()
+                dateTimeTask()
+                add()
             }
 
-
             "print" -> {
-                if (mapWithInput.isNotEmpty()) {
-                    for (str in mapWithInput) {
-                        //print(str.key)
-                        println(str.value)
-                    }
-                } else {
-                    println("No task have been input")
-                }
+                print()
+            }
+
+            "delete" -> {
+                delete()
+            }
+
+            "edit" -> {
+                edit()
             }
 
             "end" -> {
@@ -57,55 +43,200 @@ fun main() {
             }
         }
     }
-
-
 }
 
-fun arrayTask() {
-    //    1 вариант
-    val n = readln().toInt()
-    val list = IntArray(n)
-    for (i in 0 until n) {
-        list[i] = readln().toInt()
-    }
-
-//    2 вариант
-
-    val listArray = Array(readln().toInt()) { readln().toInt() }
-
-
-    val m = readln().toInt()
-    println(list.filter { x -> x == m }.size)
-}
-
-fun arrayTask2() {
-    val n = readln().toInt()
-    val listCompany = Array(n) { readln().toInt() }
-
-    val list = readln().split(" ")
-    val p = list[0].toInt()
-    val m = list[1].toInt()
-    var flag = false
-    for (i in listCompany.indices) {
-        if (listCompany[i] == p || listCompany[i] == m) {
-            flag = if (listCompany[i] == p)
-                try {
-                    listCompany[i + 1] == m
-
-                } catch (e: Exception) {
-                    false
-                }
-            else {
-                try {
-                    listCompany[i + 1] == p
-                } catch (e: Exception) {
-                    false
-                }
-            }
-            if (flag) break
+fun add() {
+    println("Input a new task (enter a blank line to end):")
+    taskValue = ""
+    while (true) {
+        val input = readln().trim()
+        if (input == "") {
+            break
+        } else {
+            taskValue += "   $input\n"
         }
     }
-    if (flag) println("NO") else println("YES")
+    if (taskValue != "") {
+        val task = Task(priorityTask, dateTask, timeTask, taskValue)
+        //mapWithInput[numTask] = taskValue
+        mapWithInputTask[numTask] = task
+        numTask++
+    } else {
+        println("The task is blank")
+    }
+}
 
 
+fun print() {
+    if (mapWithInputTask.isNotEmpty()) {
+        var j = 1
+        for (i in mapWithInputTask.values) {
+
+            println(i.toString(j))
+            j++
+        }
+    } else {
+        println("No tasks have been input")
+    }
+}
+
+fun delete() {
+    if (mapWithInputTask.isNotEmpty()) {
+        print()
+        while (true) {
+            println("Input the task number (1-${mapWithInputTask.size}):")
+            try {
+                val numForDelete = readln().toInt()
+                if (numForDelete <= 0 || numForDelete > mapWithInputTask.size) {
+                    println("Invalid task number")
+                } else {
+                    println("The task is deleted")
+                    mapWithInputTask.remove(numForDelete)
+                    //mapWithInput.remove(numForDelete)
+                    val mapNew = mutableMapOf<Int, Task>()
+                    for (m in mapWithInputTask.values) {
+                        mapNew[mapWithInputTask.values.indexOf(m) + 1] = m
+                    }
+                    mapWithInputTask = mapNew
+                    break
+                }
+            } catch (e: Exception) {
+                println("Invalid task number")
+            }
+        }
+    } else {
+        println("No tasks have been input")
+    }
+}
+
+fun edit() {
+    if (mapWithInputTask.isNotEmpty()) {
+        print()
+        loop@ while (true) {
+            println("Input the task number (1-${mapWithInputTask.size}):")
+            try {
+
+                val numForEdit = readln().toInt()
+                if (numForEdit <= 0 || numForEdit > mapWithInputTask.size) {
+                    println("Invalid task number")
+                } else {
+                    for (m in mapWithInputTask.entries) {
+                        if (numForEdit == m.key) {
+                            numTask = m.key
+                            priorityTask = m.value.getPriority()
+                            dateTask = m.value.getDate()
+                            timeTask = m.value.getTime()
+                            taskValue = m.value.getTasks()
+                            while (true) {
+                                println("Input a field to edit (priority, date, time, task):")
+                                when (readln()) {
+                                    "priority" -> {
+                                        priority()
+                                        break
+                                    }
+
+                                    "date" -> {
+                                        dateTask()
+                                        break
+                                    }
+
+                                    "time" -> {
+                                        dateTimeTask()
+                                        break
+                                    }
+
+                                    "task" -> {
+                                        add()
+                                        break
+                                    }
+
+                                    else -> {
+
+                                        println("Invalid field")
+
+                                    }
+                                }
+                            }
+                            m.value.setPriority(priorityTask)
+                            m.value.setDate(dateTask)
+                            m.value.setTime(timeTask)
+                            m.value.setTasks(taskValue)
+                            m.value.setOverdueFlag()
+                            println("The task is changed")
+                            break@loop
+                        }
+                    }
+                }
+
+            } catch (e: Exception) {
+                println("Invalid task number")
+            }
+        }
+    } else {
+        println("No tasks have been input")
+    }
+}
+
+fun priority() {
+    while (true) {
+        println("Input the task priority (C, H, N, L):")
+        priorityTask = readln().uppercase()
+
+        if (priorityTask.lowercase() in arrayOf("c", "h", "n", "l")) {
+            break
+        }
+    }
+}
+
+fun dateTimeTask() {
+    val regexTime = "(([0-1][0-9])|(2[0-3])|[0-9]):(([0-5][0-9])|[0-9])".toRegex()
+
+
+    while (true) {
+        println("Input the time (hh:mm):")
+        timeTask = readln()
+
+        if (timeTask.matches(regexTime)) {
+            try {
+                val timeTimeArray = timeTask.split(":")
+                val timeForWriting = LocalDateTime(
+                    dateTimeArray[0].toInt(),
+                    dateTimeArray[1].toInt(), dateTimeArray[2].toInt(),
+                    timeTimeArray[0].toInt(), timeTimeArray[1].toInt()
+                )
+                timeTask = timeForWriting.toString().split("T")[1]
+                break
+            } catch (e: Exception) {
+                println("The input time is invalid")
+            }
+
+        } else {
+            println("The input time is invalid")
+        }
+    }
+}
+
+
+fun dateTask() {
+    val regex = "[0-9]{4}-(0[0-9]|1[0-2]|[0-9])-([0-2][0-9]|3[0-1]|[0-9])".toRegex()
+
+
+    while (true) {
+        println("Input the date (yyyy-mm-dd):")
+        dateTask = readln()
+
+        if (dateTask.matches(regex)) {
+            try {
+                dateTimeArray = dateTask.split("-")
+                val dateForWriting =
+                    LocalDate(dateTimeArray[0].toInt(), dateTimeArray[1].toInt(), dateTimeArray[2].toInt())
+                dateTask = dateForWriting.toString()
+                break
+            } catch (e: Exception) {
+                println("The input date is invalid")
+            }
+        } else {
+            println("The input date is invalid")
+        }
+    }
 }

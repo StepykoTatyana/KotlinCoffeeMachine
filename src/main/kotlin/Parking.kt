@@ -27,8 +27,7 @@ fun main() {
     //println(list)
     //for (matches in list) matches.replaceFirstChar{ it.uppercase() }
     println(list.joinToString(""))
-    val matchResult =
-        regex.findAll(text2)
+    regex.findAll(text2)
 
 //    for (matches in matchResult) text2.replace(matches.value, matches.value.uppercase()).replace("_", "")
 //    println(text2)
