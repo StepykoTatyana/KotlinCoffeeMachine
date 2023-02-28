@@ -56,11 +56,46 @@ enum class DangerLevel(private val dangerLevel: Int) {
     }
 }
 
+data class Article(val name: String, val pages: Int, val author: String) {
+
+}
+
+fun getArticleByName(articles: MutableList<Article>, name: String): Article? {
+    var index = -1
+    for ((title, pages, author) in articles) {
+        index += 1
+        if (title == name) return articles[index]
+    }
+    return null
+}
+
+
+data class Customer(val firstName: String, val lastName: String, val age: Int, val city: String)
+
+
+class CustomerFilter {
+    fun showCustomers(customers: MutableList<Customer>) {
+        for ((p1, _, p3) in customers) {
+            if (p3 in 18..27) println(p1)
+        }
+    }
+}
+
+
+data class Comment(val id: Int, val body: String, val author: String)
+
+fun printComments(commentsData: MutableList<Comment>) {
+    for ((_, p2, p3) in commentsData) {
+        println("Author: $p3; Text: $p2")
+    }
+}
 
 fun main() {
 
 
-
+    val customer = Customer("dfsdf", "rettttt", 34, "fddgdf")
+    val customerFilter = CustomerFilter()
+    customerFilter.showCustomers(mutableListOf(customer, customer))
 
     val high = DangerLevel.HIGH
     val medium = DangerLevel.MEDIUM

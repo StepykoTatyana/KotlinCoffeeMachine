@@ -1,5 +1,7 @@
 import kotlinx.datetime.*
 
+import kotlinx.datetime.*
+
 var mapWithInputTask = mutableMapOf<Int, Task>()
 var priorityTask: String = ""
 var dateTask: String = ""
@@ -48,19 +50,38 @@ fun main() {
 fun add() {
     println("Input a new task (enter a blank line to end):")
     taskValue = ""
+    val taskArray = arrayListOf<String>()
+    var j = 1
     while (true) {
+
         val input = readln().trim()
         if (input == "") {
             break
         } else {
-            taskValue += "   $input\n"
+            taskValue += if (j > 1) {
+                taskArray.addAll(input.chunked(44))
+                "\n$input"
+            } else {
+                taskArray.addAll(input.chunked(44))
+                input
+            }
+            j++
         }
     }
     if (taskValue != "") {
-        val task = Task(priorityTask, dateTask, timeTask, taskValue)
-        //mapWithInput[numTask] = taskValue
-        mapWithInputTask[numTask] = task
-        numTask++
+        try {
+            taskValue = taskArray.joinToString("|\n|    |            |       |   |   |") { it.padEnd(44) } + "|"
+            val task = Task(
+                priorityTask,
+                dateTask,
+                timeTask,
+                taskValue
+            )
+            mapWithInputTask[numTask] = task
+            numTask++
+        } catch (e: java.lang.Exception) {
+            taskValue = taskArray.joinToString("|\n|    |            |       |   |   |") { it.padEnd(44) } + "|"
+        }
     } else {
         println("The task is blank")
     }
@@ -68,11 +89,17 @@ fun add() {
 
 
 fun print() {
+
     if (mapWithInputTask.isNotEmpty()) {
+        println("+----+------------+-------+---+---+--------------------------------------------+")
+        println("| N  |    Date    | Time  | P | D |                   Task                     |")
+        println("+----+------------+-------+---+---+--------------------------------------------+")
+
         var j = 1
         for (i in mapWithInputTask.values) {
 
             println(i.toString(j))
+            println("+----+------------+-------+---+---+--------------------------------------------+")
             j++
         }
     } else {
@@ -92,7 +119,6 @@ fun delete() {
                 } else {
                     println("The task is deleted")
                     mapWithInputTask.remove(numForDelete)
-                    //mapWithInput.remove(numForDelete)
                     val mapNew = mutableMapOf<Int, Task>()
                     for (m in mapWithInputTask.values) {
                         mapNew[mapWithInputTask.values.indexOf(m) + 1] = m
@@ -123,7 +149,7 @@ fun edit() {
                     for (m in mapWithInputTask.entries) {
                         if (numForEdit == m.key) {
                             numTask = m.key
-                            priorityTask = m.value.getPriority()
+                            priorityTask = m.value.getPriority().name
                             dateTask = m.value.getDate()
                             timeTask = m.value.getTime()
                             taskValue = m.value.getTasks()
