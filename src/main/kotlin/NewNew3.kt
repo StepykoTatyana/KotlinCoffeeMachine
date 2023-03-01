@@ -13,7 +13,7 @@ fun main() {
     val waterForOne = 200 // an integer value
     val coffeeBeansForOne = 15 // an integer value
 
-    var minimum = 0
+    var minimum: Int
     val waterNeeded = waterForUser / waterForOne
     val milkNeeded = milkForUser / milkForOne
     val coffeeNeeded = coffeeBeansForUser / coffeeBeansForOne
