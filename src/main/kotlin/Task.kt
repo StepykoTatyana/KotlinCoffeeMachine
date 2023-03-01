@@ -69,9 +69,9 @@ class Task(
 
     fun toString(key: Int): String {
         return if (key.toString().length == 1) {
-            "| $key  | $date | $time | ${priority.getColor()} | $overdueFlag |$tasks"
+            "| $key  | $date | $time | ${priority.getColor()} | ${overdueFlag.getColor()} |$tasks"
         } else {
-            "| $key | $date | $time | ${priority.getColor()} | $overdueFlag |$tasks"
+            "| $key | $date | $time | ${priority.getColor()} | ${overdueFlag.getColor()} |$tasks"
         }
     }
 

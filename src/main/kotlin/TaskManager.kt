@@ -94,6 +94,25 @@ fun add() {
             val newAdapter = moshi.adapter(TaskJson::class.java)
 
             println(newAdapter.toJson(taskJson))
+            var newHumanString = newAdapter.toJson(taskJson)
+
+            val newHuman = newAdapter.fromJson(newHumanString)
+            try {
+                val newTask = newHuman?.let { Task(newHuman.priority,it.date, newHuman.time, newHuman.tasks) }
+                if (newTask != null) {
+                    println(newTask.toString(1))
+                }
+            } catch (e: Exception) {
+                println(e.message)
+            }
+
+            if (newHuman != null) {
+                println(newHuman.date)
+            }
+            if (newHuman != null) {
+                println(newHuman.tasks)
+            }
+
 
             mapWithInputTask[numTask] = task
             numTask++
