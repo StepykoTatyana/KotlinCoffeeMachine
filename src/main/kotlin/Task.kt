@@ -1,6 +1,7 @@
 import kotlinx.datetime.*
 
-class Task(_priority: String, _date: String, _time: String, _tasks: String) {
+class Task(
+    _priority: String, _date: String, _time: String, _tasks: String) {
     private var priority: Priority
     fun getPriority(): Priority {
         return priority
@@ -28,25 +29,27 @@ class Task(_priority: String, _date: String, _time: String, _tasks: String) {
         return time
     }
 
-    private var overdueFlag: String = getOverdueFlag()
+    private var overdueFlag: Overdue = Overdue.valueOf(getOverdueFlag())
     fun setOverdueFlag() {
         val dateTimeArray = date.split("-")
         val dateForWriting =
             LocalDate(dateTimeArray[0].toInt(), dateTimeArray[1].toInt(), dateTimeArray[2].toInt())
         val currentDate = Clock.System.now().toLocalDateTime(TimeZone.of("UTC+0")).date
         val numberOfDays = currentDate.daysUntil(dateForWriting)
+
+
         overdueFlag = if (numberOfDays == 0) {
-            "\u001B[103m \u001B[0m"
+            Overdue.T
         } else if (numberOfDays > 0) {
-            "\u001B[102m \u001B[0m"
+            Overdue.I
         } else {
-            "\u001B[101m \u001B[0m"
+           Overdue.O
         }
     }
 
-    private fun getOverdueFlag(): String {
+    fun getOverdueFlag(): String {
         setOverdueFlag()
-        return overdueFlag
+        return overdueFlag.name
     }
 
     private var tasks: String = _tasks
@@ -80,6 +83,17 @@ enum class Priority(private val color: String) {
     H("\u001B[103m \u001B[0m"),
     N("\u001B[102m \u001B[0m"),
     L("\u001B[104m \u001B[0m");
+
+    fun getColor(): String {
+        return color;
+    }
+}
+
+enum class Overdue(private val color: String) {
+
+    O("\u001B[101m \u001B[0m"),
+    T("\u001B[103m \u001B[0m"),
+    I("\u001B[102m \u001B[0m");
 
     fun getColor(): String {
         return color;

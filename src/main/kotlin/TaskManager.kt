@@ -1,3 +1,5 @@
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.datetime.*
 
 import kotlinx.datetime.*
@@ -77,6 +79,22 @@ fun add() {
                 timeTask,
                 taskValue
             )
+
+            val taskJson = TaskJson(
+                priorityTask,
+                dateTask,
+                timeTask,
+                task.getOverdueFlag(),
+                taskValue.replace("|","").trim()
+            )
+            val moshi = Moshi.Builder()
+                .add(KotlinJsonAdapterFactory())
+                .build()
+
+            val newAdapter = moshi.adapter(TaskJson::class.java)
+
+            println(newAdapter.toJson(taskJson))
+
             mapWithInputTask[numTask] = task
             numTask++
         } catch (e: java.lang.Exception) {
