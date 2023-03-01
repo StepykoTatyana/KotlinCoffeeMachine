@@ -1,8 +1,8 @@
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.datetime.*
-
-import kotlinx.datetime.*
+import java.io.File
 
 var mapWithInputTask = mutableMapOf<Int, Task>()
 var priorityTask: String = ""
@@ -11,8 +11,15 @@ var timeTask: String = ""
 var dateTimeArray: List<String> = arrayListOf()
 var taskValue: String = ""
 var numTask: Int = 1
+var taskArray: Array<String> = emptyArray()
+var listForSerialization: Array<String> = emptyArray()
+val moshi: Moshi = Moshi.Builder()
+    .add(KotlinJsonAdapterFactory())
+    .build()!!
+
 
 fun main() {
+    loadingFile()
     while (true) {
         println("Input an action (add, print, edit, delete, end):")
         when (readln()) {
@@ -49,10 +56,33 @@ fun main() {
     }
 }
 
+fun loadingFile() {
+    try {
+        val file = File("${System.getProperty("user.dir")}${File.separator}tasklist.json")
+        val type = Types.newParameterizedType(List::class.java, TaskJson::class.java)
+        val adapterFactory = moshi.adapter<List<TaskJson?>>(type)
+        val listTaskJson = adapterFactory.fromJson(file.readText())
+        if (listTaskJson != null) {
+            for (f in listTaskJson) {
+                if (f != null) {
+                    val newAdapter = moshi.adapter(TaskJson::class.java)
+                    listForSerialization += newAdapter.toJson(f).toString()
+                    val task = Task(f.priority, f.date, f.time, f.tasks)
+                    task.setTasksForPrint(f.tasks)
+                    mapWithInputTask[numTask] = task
+                }
+                numTask++
+            }
+        }
+    } catch (e: Exception) {
+        println(e.message)
+    }
+}
+
 fun add() {
     println("Input a new task (enter a blank line to end):")
     taskValue = ""
-    val taskArray = arrayListOf<String>()
+    taskArray = emptyArray()
     var j = 1
     while (true) {
 
@@ -61,23 +91,27 @@ fun add() {
             break
         } else {
             taskValue += if (j > 1) {
-                taskArray.addAll(input.chunked(44))
+                //println("1")
+                taskArray += input
                 "\n$input"
             } else {
-                taskArray.addAll(input.chunked(44))
+                //println("2")
+                taskArray += input
                 input
             }
             j++
         }
     }
     if (taskValue != "") {
+        //println("3")
         try {
+            //println(taskArray)
             taskValue = taskArray.joinToString("|\n|    |            |       |   |   |") { it.padEnd(44) } + "|"
             val task = Task(
                 priorityTask,
                 dateTask,
                 timeTask,
-                taskValue
+                taskArray
             )
 
             val taskJson = TaskJson(
@@ -85,38 +119,22 @@ fun add() {
                 dateTask,
                 timeTask,
                 task.getOverdueFlag(),
-                taskValue.replace("|","").trim()
+                taskArray
             )
-            val moshi = Moshi.Builder()
-                .add(KotlinJsonAdapterFactory())
-                .build()
+            task.setTasksForPrint(taskArray)
+
 
             val newAdapter = moshi.adapter(TaskJson::class.java)
 
-            println(newAdapter.toJson(taskJson))
+            listForSerialization += newAdapter.toJson(taskJson).toString()
+
+            val file = File("${System.getProperty("user.dir")}${File.separator}tasklist.json")
+            file.writeText("[" + listForSerialization.joinToString(",") + "]")
             var newHumanString = newAdapter.toJson(taskJson)
-
-            val newHuman = newAdapter.fromJson(newHumanString)
-            try {
-                val newTask = newHuman?.let { Task(newHuman.priority,it.date, newHuman.time, newHuman.tasks) }
-                if (newTask != null) {
-                    println(newTask.toString(1))
-                }
-            } catch (e: Exception) {
-                println(e.message)
-            }
-
-            if (newHuman != null) {
-                println(newHuman.date)
-            }
-            if (newHuman != null) {
-                println(newHuman.tasks)
-            }
-
-
             mapWithInputTask[numTask] = task
             numTask++
         } catch (e: java.lang.Exception) {
+            println(e.message)
             taskValue = taskArray.joinToString("|\n|    |            |       |   |   |") { it.padEnd(44) } + "|"
         }
     } else {
@@ -189,7 +207,7 @@ fun edit() {
                             priorityTask = m.value.getPriority().name
                             dateTask = m.value.getDate()
                             timeTask = m.value.getTime()
-                            taskValue = m.value.getTasks()
+                            taskArray = m.value.getTasks()
                             while (true) {
                                 println("Input a field to edit (priority, date, time, task):")
                                 when (readln()) {
@@ -223,7 +241,7 @@ fun edit() {
                             m.value.setPriority(priorityTask)
                             m.value.setDate(dateTask)
                             m.value.setTime(timeTask)
-                            m.value.setTasks(taskValue)
+                            m.value.setTasks(taskArray)
                             m.value.setOverdueFlag()
                             println("The task is changed")
                             break@loop

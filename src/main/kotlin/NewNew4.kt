@@ -1,3 +1,7 @@
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import java.io.File
 import kotlin.math.pow
 
 
@@ -91,6 +95,65 @@ fun printComments(commentsData: MutableList<Comment>) {
 }
 
 fun main() {
+    class Human(var name: String, var age: Int, var friends: Array<String>)
+    val human = Human("Mike", 20, arrayOf("Alex", "Valery", "Ann"))
+    val moshi = Moshi.Builder().build()
+//        .add(KotlinJsonAdapterFactory())
+//        .build()
+
+    val humanAdapter = moshi.adapter(Human::class.java)
+
+    print(humanAdapter.toJson(human))
+// {"name":"Mike","age":20,"friends":["Alex","Valery","Ann"]}
+
+    val newHumanString = """
+    {"name":"John",
+    "age":25, 
+    "friends":["Mike","Helen"]}""".trimIndent()
+
+    val newHuman = humanAdapter.fromJson(newHumanString)
+
+
+    val humanList = listOf(human, newHuman)
+
+    val type = Types.newParameterizedType(List::class.java, Human::class.java)
+    val humanListAdapter = moshi.adapter<List<Human?>>(type)
+    print(humanListAdapter.toJson(humanList)) // [{"name":"Mike","age":20,"friends":["Alex","Valery","Ann"]},{"name":"John","age":25,"friends":["Mike","Helen"]}]
+
+    val jsonStr =
+        """[{"name":"Nick","age":10,"friends":["Valery"]},
+       {"name":"John","age":25,"friends":[]},
+       {"name":"Kate","age":40,"friends":[]}]
+       """.trimIndent()
+
+    val newHumanList = humanListAdapter.fromJson(jsonStr)
+
+
+
+    val workingDirectory = System.getProperty ("user.dir")
+    println(workingDirectory)
+
+    // separator
+    val separator = File.separator
+
+//combine path to string:
+    val absolutePath = "${System.getProperty ("user.dir")}${separator}words_with_numbers.txt"
+
+    println(separator)
+    println(absolutePath)
+
+    var i = 0
+    val file = File("C:\\IdeaProjects\\KotlinProjects1\\src\\main\\kotlin\\words_with_numbers.txt")
+    for (l in file.readLines()){
+        for (a in l){
+            if (a.isDigit()){
+                i++
+                break
+            }
+        }
+
+    }
+    println(i)
 
 
     val customer = Customer("dfsdf", "rettttt", 34, "fddgdf")

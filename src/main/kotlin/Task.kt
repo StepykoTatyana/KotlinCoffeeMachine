@@ -1,7 +1,11 @@
 import kotlinx.datetime.*
 
 class Task(
-    _priority: String, _date: String, _time: String, _tasks: String) {
+    _priority: String, _date: String, _time: String, _tasks: Array<String>
+
+) {
+
+
     private var priority: Priority
     fun getPriority(): Priority {
         return priority
@@ -43,7 +47,7 @@ class Task(
         } else if (numberOfDays > 0) {
             Overdue.I
         } else {
-           Overdue.O
+            Overdue.O
         }
     }
 
@@ -52,13 +56,28 @@ class Task(
         return overdueFlag.name
     }
 
-    private var tasks: String = _tasks
-    fun setTasks(value: String) {
+    private var tasks: Array<String> = _tasks
+    private var tasksForPrint: ArrayList<String> = arrayListOf()
+
+    fun setTasks(value: Array<String>) {
         tasks = value
+
     }
 
-    fun getTasks(): String {
+    fun getTasks(): Array<String> {
         return tasks
+    }
+
+    fun setTasksForPrint(value: Array<String>): List<String> {
+        for (v in value) {
+            try {
+                tasksForPrint.addAll(v.chunked(44))
+            } catch (e: Exception) {
+                tasksForPrint.add(v.trim())
+            }
+
+        }
+        return tasksForPrint
     }
 
 
@@ -69,9 +88,21 @@ class Task(
 
     fun toString(key: Int): String {
         return if (key.toString().length == 1) {
-            "| $key  | $date | $time | ${priority.getColor()} | ${overdueFlag.getColor()} |$tasks"
+            "| $key  | $date | $time | ${priority.getColor()} | ${overdueFlag.getColor()} |${
+                tasksForPrint.joinToString("|\n|    |            |       |   |   |") {
+                    it.padEnd(
+                        44
+                    )
+                } + "|"
+            }"
         } else {
-            "| $key | $date | $time | ${priority.getColor()} | ${overdueFlag.getColor()} |$tasks"
+            "| $key | $date | $time | ${priority.getColor()} | ${overdueFlag.getColor()} |${
+                tasksForPrint.joinToString("|\n|    |            |       |   |   |") {
+                    it.padEnd(
+                        44
+                    )
+                } + "|"
+            }"
         }
     }
 
